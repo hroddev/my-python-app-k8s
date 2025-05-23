@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-python-app-deployment
+  labels:
+    app: my-python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-python-app
+  template:
+    metadata:
+      labels:
+        app: my-python-app
+    spec:
+      containers:
+      - name: my-python-app
+        image: localhost:5000/my-python-app:latest # Usaremos el registro local de Kind
+        ports:
+        - containerPort: 5000 # El puerto que expone nuestra app Flask
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-python-app-service
+  labels:
+    app: my-python-app
+spec:
+  type: NodePort # Para acceder desde fuera del clúster
+  ports:
+  - port: 5000
+    targetPort: 5000
+    nodePort: 30080 # Un puerto de NodePort para acceder, asegúrate de que no esté en uso
+  selector:
+    app: my-python-app
